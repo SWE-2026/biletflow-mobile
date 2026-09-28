@@ -1,6 +1,6 @@
 import { useLocalSearchParams } from 'expo-router';
 
-import { PlaceholderScreen } from '@/components/placeholder-screen';
+import { PlaceholderScreen } from '@/shared/ui';
 
 export default function ScanResultScreen() {
   const { eventId, code } = useLocalSearchParams<{ eventId: string; code: string }>();

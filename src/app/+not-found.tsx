@@ -1,6 +1,6 @@
 import { Stack } from 'expo-router';
 
-import { PlaceholderScreen } from '@/components/placeholder-screen';
+import { PlaceholderScreen } from '@/shared/ui';
 
 export default function NotFoundScreen() {
   return (

@@ -4,8 +4,8 @@ import { DarkTheme, DefaultTheme, Stack, ThemeProvider } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useColorScheme } from 'react-native';
 
-import { AnimatedSplashOverlay } from '@/components/animated-icon';
-import { SessionProvider, useSession } from '@/providers/session-provider';
+import { SessionProvider, useSession } from '@/entities/session';
+import { AnimatedSplashOverlay } from '@/shared/ui';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -14,7 +14,6 @@ export default function RootLayout() {
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <SessionProvider>
-        <AnimatedSplashOverlay />
         <RootNavigator />
       </SessionProvider>
     </ThemeProvider>
@@ -22,16 +21,21 @@ export default function RootLayout() {
 }
 
 function RootNavigator() {
-  const { isSignedIn } = useSession();
+  const { status } = useSession();
+  const isSignedIn = status === 'signed-in';
 
   return (
-    <Stack screenOptions={{ headerShown: false }}>
-      <Stack.Protected guard={!isSignedIn}>
-        <Stack.Screen name="(auth)" />
-      </Stack.Protected>
-      <Stack.Protected guard={isSignedIn}>
-        <Stack.Screen name="(app)" />
-      </Stack.Protected>
-    </Stack>
+    <>
+      <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Protected guard={!isSignedIn}>
+          <Stack.Screen name="(auth)" />
+        </Stack.Protected>
+        <Stack.Protected guard={isSignedIn}>
+          <Stack.Screen name="(app)" />
+        </Stack.Protected>
+      </Stack>
+      {/* Keep the native splash up until the stored session has been restored. */}
+      {status !== 'loading' && <AnimatedSplashOverlay />}
+    </>
   );
 }
