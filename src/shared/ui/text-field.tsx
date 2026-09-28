@@ -63,6 +63,7 @@ const styles = StyleSheet.create({
     borderWidth: 1.5,
     fontSize: 16,
     // Web draws its own focus ring; the border color already shows focus.
+    outlineStyle: 'solid',
     outlineWidth: 0,
   },
 });
