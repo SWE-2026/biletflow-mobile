@@ -21,7 +21,7 @@ npx expo-doctor             # diagnose dependency and config issues
 npx expo install --fix      # fix incompatible package versions
 ```
 
-Run lint and typecheck before declaring any task done.
+Run lint and typecheck before declaring any task done. The codebase must stay at **zero lint errors and zero type errors** — fix every error `npx expo lint` or `npx tsc --noEmit` reports, including pre-existing ones, and never silence them with `eslint-disable` or `@ts-ignore` unless there is no other fix (explain why in a comment).
 
 ## Navigation & Routing
 
