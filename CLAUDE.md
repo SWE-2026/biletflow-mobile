@@ -55,3 +55,20 @@ Inside a slice, group code by purpose, not by file type: `ui/`, `model/` (state,
 - **shared:** `ui` (themed primitives), `api` (HTTP client), `config` (env, theme tokens), `lib`
 
 Add new slices when a requirement doesn't fit these; don't grow an existing slice past its domain.
+
+## API
+
+- Backend: `../biletflow-api` (Go). The contract is `biletflow-api/docs/api.md`; the app uses the
+  `/auth/*` endpoints. Change the contract there first if the app needs more.
+- Run it with `docker compose up --build` in `biletflow-api` (API on :8080, local mode).
+- `EXPO_PUBLIC_API_URL` includes `/api/v1` and defaults to `http://localhost:8080/api/v1` (iOS
+  simulator, web). Android emulator: `http://10.0.2.2:8080/api/v1`; physical device: your LAN IP.
+- There is no in-app mock. In local mode the API returns one-time codes as `demoCode`, which the
+  verify screen shows with a "Local mode" label.
+- `apiRequest` takes the session token explicitly (`useSession().session.token`). Errors are
+  `ApiError` with `code`, `message` and `fields`; show `message`, branch on `code`.
+
+## Reporting style
+
+After each task, reply concisely: what changed, what's left, one-line rationale only when a
+decision is non-obvious.
