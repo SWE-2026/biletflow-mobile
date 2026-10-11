@@ -1,1 +1,1 @@
-export { ApiError, apiRequest } from './http-client';
+export { ApiError, apiRequest, errorMessage } from './http-client';

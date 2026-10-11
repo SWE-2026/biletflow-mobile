@@ -1,16 +1,19 @@
 import { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
+import { errorMessage } from '@/shared/api';
 import { Spacing } from '@/shared/config';
 import { Button, TextField } from '@/shared/ui';
 
 import { requestOtp } from '../api/otp-api';
-import { errorMessage } from '../model/errors';
 import { isValidEmail, normalizeEmail } from '../model/validation';
 
 type RequestOtpFormProps = {
-  /** Called with the normalized email once the code has been sent. */
-  onCodeSent: (email: string) => void;
+  /**
+   * Called with the normalized email once the code has been sent, plus the code itself when the
+   * API runs in local mode without an email provider.
+   */
+  onCodeSent: (email: string, demoCode?: string) => void;
 };
 
 export function RequestOtpForm({ onCodeSent }: RequestOtpFormProps) {
@@ -27,8 +30,8 @@ export function RequestOtpForm({ onCodeSent }: RequestOtpFormProps) {
     setSubmitting(true);
     try {
       const normalized = normalizeEmail(email);
-      await requestOtp(normalized);
-      onCodeSent(normalized);
+      const challenge = await requestOtp(normalized);
+      onCodeSent(normalized, challenge.demoCode);
     } catch (e) {
       setError(errorMessage(e));
     } finally {

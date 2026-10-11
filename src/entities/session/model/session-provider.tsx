@@ -1,5 +1,6 @@
 import { createContext, use, useEffect, useState, type PropsWithChildren } from 'react';
 
+import { apiRequest } from '@/shared/api';
 import { secureStorage } from '@/shared/lib';
 
 import type { Session, SessionStatus } from './types';
@@ -23,7 +24,9 @@ export function SessionProvider({ children }: PropsWithChildren) {
     secureStorage
       .get(STORAGE_KEY)
       .then((raw) => {
-        const restored = raw ? (JSON.parse(raw) as Session) : null;
+        const parsed = raw ? (JSON.parse(raw) as Partial<Session>) : null;
+        // Sessions stored before the API contract included roles are discarded
+        const restored = parsed?.token && parsed.user?.role ? (parsed as Session) : null;
         setSession(restored);
         setStatus(restored ? 'signed-in' : 'signed-out');
       })
@@ -37,6 +40,10 @@ export function SessionProvider({ children }: PropsWithChildren) {
   };
 
   const signOut = async () => {
+    // Revoke the token server-side, but sign out locally even if that request fails
+    if (session) {
+      apiRequest('/auth/logout', { method: 'POST', token: session.token }).catch(() => undefined);
+    }
     setSession(null);
     setStatus('signed-out');
     await secureStorage.remove(STORAGE_KEY);

@@ -1,7 +1,12 @@
 export type User = {
   id: string;
   email: string;
-  name?: string;
+  displayName: string;
+  role: 'customer' | 'organizer' | 'staff' | 'admin';
+  organizerId: string | null;
+  emailVerified: boolean;
+  hasPassword: boolean;
+  createdAt: string;
 };
 
 export type Session = {

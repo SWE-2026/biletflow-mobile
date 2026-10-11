@@ -2,24 +2,27 @@ import { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
 import { useSession } from '@/entities/session';
+import { errorMessage } from '@/shared/api';
 import { Spacing } from '@/shared/config';
 import { Button, FieldError, OtpInput, ThemedText } from '@/shared/ui';
 
-import { isMockAuth, MOCK_OTP_CODE, requestOtp, verifyOtp } from '../api/otp-api';
+import { requestOtp, verifyOtp } from '../api/otp-api';
 import { OTP_LENGTH, RESEND_COOLDOWN_SECONDS } from '../config/otp';
-import { errorMessage } from '../model/errors';
 import { useCountdown } from '../model/use-countdown';
 
 type VerifyOtpFormProps = {
   email: string;
+  /** Code returned by the API in local mode, shown so the flow works without email. */
+  demoCode?: string;
 };
 
-export function VerifyOtpForm({ email }: VerifyOtpFormProps) {
+export function VerifyOtpForm({ email, demoCode: initialDemoCode }: VerifyOtpFormProps) {
   const { signIn } = useSession();
   const [code, setCode] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [verifying, setVerifying] = useState(false);
   const [resending, setResending] = useState(false);
+  const [demoCode, setDemoCode] = useState(initialDemoCode);
   const cooldown = useCountdown(RESEND_COOLDOWN_SECONDS);
 
   const verify = async (value: string) => {
@@ -40,7 +43,8 @@ export function VerifyOtpForm({ email }: VerifyOtpFormProps) {
     setError(null);
     setResending(true);
     try {
-      await requestOtp(email);
+      const challenge = await requestOtp(email);
+      setDemoCode(challenge.demoCode);
       setCode('');
       cooldown.restart();
     } catch (e) {
@@ -65,9 +69,9 @@ export function VerifyOtpForm({ email }: VerifyOtpFormProps) {
           editable={!verifying}
         />
         {error ? <FieldError message={error} /> : null}
-        {isMockAuth ? (
+        {demoCode ? (
           <ThemedText type="small" themeColor="textSecondary">
-            Dev mode (no API URL): use code {MOCK_OTP_CODE}.
+            Local mode, no email sent. Your code is {demoCode}.
           </ThemedText>
         ) : null}
       </View>

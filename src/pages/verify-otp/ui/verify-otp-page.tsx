@@ -6,7 +6,7 @@ import { Spacing } from '@/shared/config';
 import { Button, Screen, ThemedText } from '@/shared/ui';
 
 export function VerifyOtpPage() {
-  const { email } = useLocalSearchParams<{ email?: string }>();
+  const { email, demoCode } = useLocalSearchParams<{ email?: string; demoCode?: string }>();
 
   if (!email) return <Redirect href="/sign-in" />;
 
@@ -18,7 +18,7 @@ export function VerifyOtpPage() {
           Enter the code we sent to <ThemedText>{email}</ThemedText>
         </ThemedText>
       </View>
-      <VerifyOtpForm email={email} />
+      <VerifyOtpForm email={email} demoCode={demoCode} />
       <Button
         variant="ghost"
         title="Use a different email"

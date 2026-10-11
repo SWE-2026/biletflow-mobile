@@ -1,26 +1,17 @@
 import type { Session } from '@/entities/session';
 import { apiRequest } from '@/shared/api';
-import { env } from '@/shared/config';
 
-/** No backend configured: accept a fixed code so the flow is usable in dev. */
-export const isMockAuth = env.apiUrl === null;
-export const MOCK_OTP_CODE = '123456';
+export type OtpChallenge = {
+  expiresInSeconds: number;
+  resendInSeconds: number;
+  /** Only when the API runs in local mode without an email provider. */
+  demoCode?: string;
+};
 
-const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
-
-export async function requestOtp(email: string): Promise<void> {
-  if (isMockAuth) {
-    await delay(500);
-    return;
-  }
-  await apiRequest<void>('/auth/otp/request', { method: 'POST', body: { email } });
+export function requestOtp(email: string): Promise<OtpChallenge> {
+  return apiRequest<OtpChallenge>('/auth/otp/request', { method: 'POST', body: { email } });
 }
 
-export async function verifyOtp(email: string, code: string): Promise<Session> {
-  if (isMockAuth) {
-    await delay(500);
-    if (code !== MOCK_OTP_CODE) throw new Error('Invalid or expired code.');
-    return { token: `mock-${Date.now()}`, user: { id: 'mock-user', email } };
-  }
+export function verifyOtp(email: string, code: string): Promise<Session> {
   return apiRequest<Session>('/auth/otp/verify', { method: 'POST', body: { email, code } });
 }
