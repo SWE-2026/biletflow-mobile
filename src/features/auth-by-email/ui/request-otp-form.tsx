@@ -78,6 +78,6 @@ const styles = StyleSheet.create({
   submit: {
     width: '100%',
     maxWidth: 200,
-    alignSelf: 'flex-start',
+    alignSelf: 'center',
   },
 });

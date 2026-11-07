@@ -8,7 +8,10 @@ export default function CheckInsScreen() {
   return (
     <PlaceholderScreen
       title="Check-in log"
-      description={`Recent check-ins and reversals synced with the platform (SRS 4.8). Event: ${eventId}`}
+      description="Recent check-ins and reversals (SRS 4.8). Blocked on the API: there is no staff endpoint that lists an event's check-ins yet."
+      links={[
+        { label: 'Find an attendee', href: { pathname: '/events/[eventId]/attendees', params: { eventId } } },
+      ]}
     />
   );
 }
