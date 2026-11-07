@@ -2,30 +2,30 @@ import { Platform } from 'react-native';
 
 export const Colors = {
   light: {
-    text: '#000000',
+    text: '#101828', // gray-900
     background: '#ffffff',
-    backgroundElement: '#F0F0F3',
-    backgroundSelected: '#E0E1E6',
-    textSecondary: '#60646C',
-    border: '#D9D9E0',
-    primary: '#208AEF',
+    backgroundElement: '#f3f4f6', // gray-100
+    backgroundSelected: '#e5e7eb', // gray-200
+    textSecondary: '#4a5565', // gray-600
+    border: '#d1d5dc', // gray-300
+    primary: '#4f39f6', // indigo-600
     onPrimary: '#ffffff',
-    danger: '#DC3E42',
-    success: '#218358',
-    warning: '#AB6400',
+    danger: '#c10007', // red-700
+    success: '#008236', // green-700
+    warning: '#bb4d00', // amber-700
   },
   dark: {
-    text: '#ffffff',
-    background: '#000000',
-    backgroundElement: '#212225',
-    backgroundSelected: '#2E3135',
-    textSecondary: '#B0B4BA',
-    border: '#3A3F42',
-    primary: '#3D9BF2',
+    text: '#f9fafb', // gray-50
+    background: '#030712', // gray-950
+    backgroundElement: '#101828', // gray-900
+    backgroundSelected: '#1e2939', // gray-800
+    textSecondary: '#99a1af', // gray-400
+    border: '#364153', // gray-700
+    primary: '#615fff', // indigo-500
     onPrimary: '#ffffff',
-    danger: '#FF6369',
-    success: '#3DD68C',
-    warning: '#FFCA16',
+    danger: '#ff6467', // red-400
+    success: '#05df72', // green-400
+    warning: '#ffb900', // amber-400
   },
 } as const;
 
