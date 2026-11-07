@@ -1,1 +1,1 @@
-export { ApiError, apiRequest, errorMessage } from './http-client';
+export { ApiError, apiRequest, errorMessage, setUnauthorizedHandler } from './http-client';

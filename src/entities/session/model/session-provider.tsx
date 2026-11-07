@@ -1,6 +1,6 @@
 import { createContext, use, useEffect, useState, type PropsWithChildren } from 'react';
 
-import { apiRequest } from '@/shared/api';
+import { apiRequest, setUnauthorizedHandler } from '@/shared/api';
 import { secureStorage } from '@/shared/lib';
 
 import type { Session, SessionStatus } from './types';
@@ -33,6 +33,16 @@ export function SessionProvider({ children }: PropsWithChildren) {
       .catch(() => setStatus('signed-out'));
   }, []);
 
+  // A revoked or expired token signs the device out locally (no logout call: the token is dead).
+  useEffect(() => {
+    setUnauthorizedHandler(() => {
+      setSession(null);
+      setStatus('signed-out');
+      secureStorage.remove(STORAGE_KEY).catch(() => undefined);
+    });
+    return () => setUnauthorizedHandler(null);
+  }, []);
+
   const signIn = async (next: Session) => {
     await secureStorage.set(STORAGE_KEY, JSON.stringify(next));
     setSession(next);
@@ -56,4 +66,9 @@ export function useSession() {
   const value = use(SessionContext);
   if (!value) throw new Error('useSession must be used within SessionProvider');
   return value;
+}
+
+/** The signed-in user's API token. Empty while signing out, so requests then fail with 401. */
+export function useAuthToken(): string {
+  return useSession().session?.token ?? '';
 }

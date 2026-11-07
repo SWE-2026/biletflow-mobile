@@ -13,6 +13,13 @@ export class ApiError extends Error {
   }
 }
 
+let onUnauthorized: (() => void) | null = null;
+
+/** Registers what happens when the API rejects the session token (401), e.g. a local sign-out. */
+export function setUnauthorizedHandler(handler: (() => void) | null) {
+  onUnauthorized = handler;
+}
+
 type RequestOptions = {
   method?: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
   body?: unknown;
@@ -58,6 +65,7 @@ export async function apiRequest<T>(
   const data: unknown = response.status === 204 ? null : await response.json().catch(() => null);
 
   if (!response.ok) {
+    if (response.status === 401 && token) onUnauthorized?.();
     throw new ApiError(
       response.status,
       readString(data, 'code') ?? 'http_error',
