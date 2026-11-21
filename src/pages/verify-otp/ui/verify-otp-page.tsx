@@ -8,7 +8,7 @@ import { Button, Screen, ThemedText } from '@/shared/ui';
 export function VerifyOtpPage() {
   const { email, demoCode } = useLocalSearchParams<{ email?: string; demoCode?: string }>();
 
-  if (!email) return <Redirect href="/sign-in" />;
+  if (!email) return <Redirect href="/scanner/sign-in" />;
 
   return (
     <Screen>
@@ -22,7 +22,7 @@ export function VerifyOtpPage() {
       <Button
         variant="ghost"
         title="Use a different email"
-        onPress={() => (router.canGoBack() ? router.back() : router.replace('/sign-in'))}
+        onPress={() => (router.canGoBack() ? router.back() : router.replace('/scanner/sign-in'))}
       />
     </Screen>
   );

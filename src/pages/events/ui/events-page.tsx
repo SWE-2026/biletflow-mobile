@@ -43,7 +43,7 @@ export function EventsPage() {
       renderItem={({ item }) => (
         <EventCard
           event={item}
-          onPress={() => router.push({ pathname: '/events/[eventId]', params: { eventId: item.id } })}
+          onPress={() => router.push({ pathname: '/scanner/events/[eventId]', params: { eventId: item.id } })}
         />
       )}
       ListEmptyComponent={empty}

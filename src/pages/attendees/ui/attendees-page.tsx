@@ -10,7 +10,7 @@ export function AttendeesPage() {
       eventId={eventId}
       onSelectTicket={(ticket) =>
         router.push({
-          pathname: '/events/[eventId]/attendees/[ticketId]',
+          pathname: '/scanner/events/[eventId]/attendees/[ticketId]',
           params: { eventId, ticketId: ticket.id },
         })
       }

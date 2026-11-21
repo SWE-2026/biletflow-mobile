@@ -1,6 +1,6 @@
 import { router, Stack } from 'expo-router';
 
-import { HeaderIconButton } from '@/shared/ui';
+import { HeaderButton, HeaderIconButton } from '@/shared/ui';
 
 export default function AppLayout() {
   return (
@@ -9,11 +9,12 @@ export default function AppLayout() {
         name="index"
         options={{
           title: 'My events',
+          headerLeft: () => <HeaderButton label="‹ Apps" onPress={() => router.dismissTo('/')} />,
           headerRight: () => (
             <HeaderIconButton
               icon={{ ios: 'person.crop.circle', android: 'account_circle', web: 'account_circle' }}
               label="Profile"
-              onPress={() => router.push('/profile')}
+              onPress={() => router.push('/scanner/profile')}
             />
           ),
         }}

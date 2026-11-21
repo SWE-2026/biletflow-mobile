@@ -16,7 +16,7 @@ export function SignInPage() {
       </View>
       <RequestOtpForm
         onCodeSent={(email, demoCode) =>
-          router.push({ pathname: '/verify', params: { email, ...(demoCode && { demoCode }) } })
+          router.push({ pathname: '/scanner/verify', params: { email, ...(demoCode && { demoCode }) } })
         }
       />
     </Screen>

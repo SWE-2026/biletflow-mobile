@@ -16,7 +16,7 @@ export default function EventLayout() {
     <Tabs
       screenOptions={{
         // The event's tabs replace the stack header, so they need their own way back.
-        headerLeft: () => <HeaderButton label="‹ Events" onPress={() => router.dismissTo('/')} />,
+        headerLeft: () => <HeaderButton label="‹ Events" onPress={() => router.dismissTo('/scanner')} />,
       }}>
       <Tabs.Screen
         name="index"

@@ -12,6 +12,7 @@ type SessionContextValue = {
   session: Session | null;
   signIn: (session: Session) => Promise<void>;
   signOut: () => Promise<void>;
+  syncSession: (next: Session | null) => Promise<void>;
 };
 
 const SessionContext = createContext<SessionContextValue | null>(null);
@@ -59,7 +60,19 @@ export function SessionProvider({ children }: PropsWithChildren) {
     await secureStorage.remove(STORAGE_KEY);
   };
 
-  return <SessionContext value={{ status, session, signIn, signOut }}>{children}</SessionContext>;
+  const syncSession = async (next: Session | null) => {
+    if (next) {
+      await signIn(next);
+      return;
+    }
+    setSession(null);
+    setStatus('signed-out');
+    await secureStorage.remove(STORAGE_KEY);
+  };
+
+  return (
+    <SessionContext value={{ status, session, signIn, signOut, syncSession }}>{children}</SessionContext>
+  );
 }
 
 export function useSession() {

@@ -9,7 +9,7 @@ export default function NotFoundScreen() {
       <PlaceholderScreen
         title="Screen not found"
         description="This route does not exist."
-        links={[{ label: 'Back to events', href: '/' }]}
+        links={[{ label: 'Back to start', href: '/' }]}
       />
     </>
   );

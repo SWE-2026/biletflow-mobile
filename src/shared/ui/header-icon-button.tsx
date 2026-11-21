@@ -9,9 +9,11 @@ type HeaderIconButtonProps = {
   /** Read by screen readers, since the button has no visible text. */
   label: string;
   onPress: () => void;
+  /** Defaults to the theme's primary color; pass one for headers with a colored background. */
+  tintColor?: string;
 };
 
-export function HeaderIconButton({ icon, label, onPress }: HeaderIconButtonProps) {
+export function HeaderIconButton({ icon, label, onPress, tintColor }: HeaderIconButtonProps) {
   const theme = useTheme();
 
   return (
@@ -21,7 +23,7 @@ export function HeaderIconButton({ icon, label, onPress }: HeaderIconButtonProps
       hitSlop={Spacing.two}
       onPress={onPress}
       style={({ pressed }) => [styles.button, pressed && styles.pressed]}>
-      <SymbolView name={icon} size={26} tintColor={theme.primary} />
+      <SymbolView name={icon} size={26} tintColor={tintColor ?? theme.primary} />
     </Pressable>
   );
 }

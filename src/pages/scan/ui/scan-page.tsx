@@ -10,7 +10,7 @@ export function ScanPage() {
     <QrScanner
       eventId={eventId}
       onResult={(result) =>
-        router.push({ pathname: '/scan-result', params: { eventId, result: serializeCheckInResult(result) } })
+        router.push({ pathname: '/scanner/scan-result', params: { eventId, result: serializeCheckInResult(result) } })
       }
     />
   );

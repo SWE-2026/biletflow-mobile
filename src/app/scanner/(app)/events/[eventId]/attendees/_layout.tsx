@@ -9,7 +9,7 @@ export default function AttendeesLayout() {
         name="index"
         options={{
           title: 'Attendees',
-          headerLeft: () => <HeaderButton label="‹ Events" onPress={() => router.dismissTo('/')} />,
+          headerLeft: () => <HeaderButton label="‹ Events" onPress={() => router.dismissTo('/scanner')} />,
         }}
       />
       <Stack.Screen name="[ticketId]" options={{ title: 'Ticket' }} />

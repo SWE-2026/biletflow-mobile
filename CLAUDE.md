@@ -48,7 +48,7 @@ Inside a slice, group code by purpose, not by file type: `ui/`, `model/` (state,
 
 ### Expected slices for the scanner app
 
-- **pages:** `sign-in`, `forgot-password`, `events`, `profile`, `event-overview`, `scan`, `scan-result`, `attendees`, `ticket`, `check-ins`
+- **pages:** `launcher` (first screen: web app or scanner), `web-app` (the web app in a WebView), `sign-in`, `forgot-password`, `events`, `profile`, `event-overview`, `scan`, `scan-result`, `attendees`, `ticket`, `check-ins`
 - **widgets:** `qr-scanner`, `check-in-stats`, `attendee-list`, `check-in-log`
 - **features:** `auth-by-email`, `reset-password`, `sign-out`, `scan-ticket`, `check-in-attendee`, `undo-check-in`, `search-attendees`
 - **entities:** `session`, `event`, `ticket`, `attendee`, `check-in`
@@ -63,6 +63,12 @@ Add new slices when a requirement doesn't fit these; don't grow an existing slic
 - Run it with `docker compose up --build` in `biletflow-api` (API on :8080, local mode).
 - `EXPO_PUBLIC_API_URL` includes `/api/v1` and defaults to `http://localhost:8080/api/v1` (iOS
   simulator, web). Android emulator: `http://10.0.2.2:8080/api/v1`; physical device: your LAN IP.
+- `EXPO_PUBLIC_WEB_URL` is where biletflow-frontend is served (default `http://localhost:5173`); the
+  launcher's "BiletFlow" option shows it in a WebView, so web changes need no app rebuild. On a device,
+  run `npm run dev -- --host` there and use your LAN IP; the web app must use the same API as this app.
+- The WebView and the scanner share one session (`pages/web-app/lib/bridge.ts`): the native session
+  is written to the web app's `localStorage` before each page load, and the web app posts
+  `session`/`download` messages back. The web side is `biletflow-frontend/src/shared/lib/native-app`.
 - There is no in-app mock. In local mode the API returns one-time codes as `demoCode`, which the
   verify screen shows with a "Local mode" label.
 - `apiRequest` takes the session token explicitly (`useSession().session.token`). Errors are
