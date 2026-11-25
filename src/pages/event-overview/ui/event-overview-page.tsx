@@ -12,6 +12,7 @@ import {
 } from '@/entities/event';
 import { useAuthToken } from '@/entities/session';
 import { CheckInStats } from '@/widgets/check-in-stats';
+import { OfflineCheckInPanel } from '@/widgets/offline-check-in-panel';
 import { errorMessage } from '@/shared/api';
 import { MaxContentWidth, Spacing } from '@/shared/config';
 import { useAsyncData, useRefreshOnFocus, useTheme } from '@/shared/lib';
@@ -67,9 +68,26 @@ export function EventOverviewPage() {
         </Card>
       )}
 
+      {error ? (
+        <Card>
+          <ThemedText type="smallBold" themeColor="warning">
+            No connection
+          </ThemedText>
+          <ThemedText type="small" themeColor="textSecondary">
+            The totals below may be out of date. {errorMessage(error)}
+          </ThemedText>
+        </Card>
+      ) : null}
+
       <Section title="Check-in progress">
         <CheckInStats summary={summary} />
       </Section>
+
+      {acceptsCheckIn(event) ? (
+        <Section title="Offline check-in">
+          <OfflineCheckInPanel eventId={eventId} timeZone={event.timezone} />
+        </Section>
+      ) : null}
 
       <Section title="Event details">
         <Card style={styles.details}>

@@ -1,6 +1,9 @@
 export { confirm } from './confirm';
 export { formatDate, formatDateTime, formatTime } from './format-date';
+export { localStore } from './local-store';
+export { randomUuid } from './random-id';
 export { secureStorage } from './secure-storage';
+export { sha256Hex } from './sha256';
 export { useAsyncData, type AsyncData } from './use-async-data';
 export { useColorScheme } from './use-color-scheme';
 export { useDebouncedValue } from './use-debounced-value';

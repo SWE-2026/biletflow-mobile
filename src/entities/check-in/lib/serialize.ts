@@ -20,10 +20,10 @@ export function parseCheckInResult(raw: string | undefined): CheckInResult | nul
   try {
     const value: unknown = JSON.parse(raw);
     if (typeof value !== 'object' || value === null) return null;
-    const { result, ticket } = value as Partial<CheckInResult>;
+    const { result, ticket, offline } = value as Partial<CheckInResult>;
     if (!result || !outcomes.includes(result)) return null;
     const validTicket = typeof ticket === 'object' && ticket !== null && typeof ticket.id === 'string';
-    return { result, ticket: validTicket ? ticket : null };
+    return { result, ticket: validTicket ? ticket : null, ...(offline === true && { offline }) };
   } catch {
     return null;
   }

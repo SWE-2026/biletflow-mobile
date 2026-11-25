@@ -49,9 +49,9 @@ Inside a slice, group code by purpose, not by file type: `ui/`, `model/` (state,
 ### Expected slices for the scanner app
 
 - **pages:** `launcher` (first screen: web app or scanner), `web-app` (the web app in a WebView), `sign-in`, `forgot-password`, `events`, `profile`, `event-overview`, `scan`, `scan-result`, `attendees`, `ticket`, `check-ins`
-- **widgets:** `qr-scanner`, `check-in-stats`, `attendee-list`, `check-in-log`
-- **features:** `auth-by-email`, `reset-password`, `sign-out`, `scan-ticket`, `check-in-attendee`, `undo-check-in`, `search-attendees`
-- **entities:** `session`, `event`, `ticket`, `attendee`, `check-in`
+- **widgets:** `qr-scanner`, `check-in-stats`, `attendee-list`, `check-in-log`, `offline-check-in-panel`
+- **features:** `auth-by-email`, `reset-password`, `sign-out`, `scan-ticket`, `check-in-attendee`, `undo-check-in`, `search-attendees`, `download-offline-tickets`, `sync-offline-check-ins`
+- **entities:** `session`, `event`, `ticket`, `attendee`, `check-in`, `offline-check-in` (downloaded ticket list and offline queue, kept on the device with `shared/lib` `localStore`)
 - **shared:** `ui` (themed primitives), `api` (HTTP client), `config` (env, theme tokens), `lib`
 
 Add new slices when a requirement doesn't fit these; don't grow an existing slice past its domain.

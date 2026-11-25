@@ -13,4 +13,6 @@ export type CheckInResult = {
   result: CheckInOutcome;
   /** `null` for `invalid` and `campaign_qr`. */
   ticket: StaffTicket | null;
+  /** Set when the scanner decided offline from its downloaded ticket list (never sent by the API). */
+  offline?: boolean;
 };

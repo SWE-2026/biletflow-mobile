@@ -2,7 +2,7 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { ScrollView, StyleSheet } from 'react-native';
 
-import { CheckInResultCard, parseCheckInResult } from '@/entities/check-in';
+import { CheckInResultCard, parseCheckInResult, type CheckInResult } from '@/entities/check-in';
 import { canUndoCheckIn, fetchStaffEvent } from '@/entities/event';
 import { useAuthToken } from '@/entities/session';
 import { UndoCheckInButton } from '@/features/undo-check-in';
@@ -32,7 +32,8 @@ export function ScanResultPage() {
 
   const { ticket } = result;
   const timeZone = details?.event.timezone;
-  const showUndo = result.result === 'valid' && ticket && details && canUndoCheckIn(details.role);
+  // Undo needs the server; an offline admission is undone after it syncs, from the ticket screen.
+  const showUndo = result.result === 'valid' && !result.offline && ticket && details && canUndoCheckIn(details.role);
 
   return (
     <ScrollView contentContainerStyle={styles.content}>
@@ -49,11 +50,31 @@ export function ScanResultPage() {
           checkedInAtLabel={ticket?.checkedInAt ? formatDateTime(ticket.checkedInAt, timeZone) : undefined}
         />
       )}
+      {result.offline ? <OfflineNote result={result} /> : null}
       <Button title="Scan next" onPress={() => router.back()} />
       {showUndo && !undone ? (
         <UndoCheckInButton eventId={eventId} ticket={ticket} onUndone={() => setUndone(true)} />
       ) : null}
     </ScrollView>
+  );
+}
+
+function OfflineNote({ result }: { result: CheckInResult }) {
+  const message =
+    result.result === 'valid'
+      ? 'No connection, so this ticket was checked against the list saved on this phone. The check-in syncs when the connection is back.'
+      : result.result === 'invalid'
+        ? 'No connection, and this code is not in the ticket list saved on this phone. Tickets bought after the list was downloaded are missing from it: check again once online.'
+        : 'No connection, so this ticket was checked against the list saved on this phone.';
+  return (
+    <Card>
+      <ThemedText type="smallBold" themeColor="warning">
+        Checked offline
+      </ThemedText>
+      <ThemedText type="small" themeColor="textSecondary">
+        {message}
+      </ThemedText>
+    </Card>
   );
 }
 

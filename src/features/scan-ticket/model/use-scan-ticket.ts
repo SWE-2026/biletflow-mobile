@@ -1,8 +1,10 @@
 import { useRef, useState } from 'react';
 
 import type { CheckInResult } from '@/entities/check-in';
-import { useAuthToken } from '@/entities/session';
-import { errorMessage } from '@/shared/api';
+import { checkInOffline, hasOfflineTickets, queuedScans, syncOfflineCheckIns } from '@/entities/offline-check-in';
+import { useSession } from '@/entities/session';
+import { ApiError, errorMessage } from '@/shared/api';
+import { randomUuid } from '@/shared/lib';
 
 import { checkInByQrCode } from '../api/scan-api';
 
@@ -10,18 +12,56 @@ import { checkInByQrCode } from '../api/scan-api';
 const REPEAT_COOLDOWN_MS = 3000;
 /** The API accepts QR tokens up to this length. */
 const MAX_CODE_LENGTH = 512;
+/** With a downloaded ticket list, a scan waits this long for the server before deciding offline. */
+const OFFLINE_FALLBACK_MS = 4000;
+/** Without one, a scan gives up on the server after this long. */
+const ONLINE_TIMEOUT_MS = 20_000;
 
 type UseScanTicketOptions = {
   eventId: string;
   onResult: (result: CheckInResult) => void;
 };
 
+/** No answer from the server: no network, a timeout, or a gateway in front of a down API. */
+function isConnectivityError(error: unknown): boolean {
+  if (error instanceof Error && error.name === 'AbortError') return true;
+  return error instanceof ApiError && (error.status === 0 || [502, 503, 504].includes(error.status));
+}
+
+/**
+ * Online check-in with a time limit; on a connectivity error the scan is decided from the
+ * downloaded ticket list instead. Rethrows when there is no list to fall back on.
+ */
+async function checkIn(token: string, userId: string, eventId: string, code: string): Promise<CheckInResult> {
+  const scanId = randomUuid();
+  const controller = new AbortController();
+  const canFallBack = hasOfflineTickets(userId, eventId);
+  const timer = setTimeout(() => controller.abort(), canFallBack ? OFFLINE_FALLBACK_MS : ONLINE_TIMEOUT_MS);
+  try {
+    const result = await checkInByQrCode(token, eventId, code, scanId, controller.signal);
+    // Back online: send anything this device admitted offline.
+    if (queuedScans(userId, eventId).length > 0) void syncOfflineCheckIns(token, userId, eventId);
+    return result;
+  } catch (error) {
+    const offline = canFallBack && isConnectivityError(error) ? checkInOffline(userId, eventId, code, scanId) : null;
+    if (offline) return offline;
+    if (error instanceof Error && error.name === 'AbortError') {
+      throw new Error('The server did not answer. Check your network, or download the ticket list for offline check-in.');
+    }
+    throw error;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 /**
  * Turns raw camera reads into check-ins: one request at a time, repeated reads of the same code
  * ignored, and the outcome handed to `onResult`.
  */
 export function useScanTicket({ eventId, onResult }: UseScanTicketOptions) {
-  const token = useAuthToken();
+  const { session } = useSession();
+  const token = session?.token ?? '';
+  const userId = session?.user.id ?? '';
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const busy = useRef(false);
@@ -43,7 +83,7 @@ export function useScanTicket({ eventId, onResult }: UseScanTicketOptions) {
     setPending(true);
     setError(null);
     try {
-      onResult(await checkInByQrCode(token, eventId, code));
+      onResult(await checkIn(token, userId, eventId, code));
     } catch (e) {
       // Allow an immediate retry of the same code after a network error.
       last.current = null;
