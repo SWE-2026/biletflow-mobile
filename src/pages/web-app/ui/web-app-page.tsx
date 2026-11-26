@@ -29,7 +29,9 @@ function openExternally(url: string) {
 export function WebAppPage() {
   const theme = useTheme();
   const { session, syncSession } = useSession();
-  const webView = useRef<WebView>(null);
+  // react-native-webview 14 defaults the extra-props generic to `undefined`, which types every prop
+  // as `never`; `object` restores the 13.x default (`{}`).
+  const webView = useRef<WebView<object>>(null);
   const [canGoBack, setCanGoBack] = useState(false);
 
   const injectedSession = useMemo(() => sessionInjectionScript(session, env.webOrigin), [session]);
@@ -93,7 +95,7 @@ export function WebAppPage() {
         }}
       />
       <StatusBar style="light" />
-      <WebView
+      <WebView<object>
         ref={webView}
         source={{ uri: env.webUrl }}
         style={[styles.flex, { backgroundColor: theme.background }]}

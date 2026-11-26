@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react';
-import { Pressable, StyleSheet, TextInput, View } from 'react-native';
+import { Pressable, StyleSheet, TextInput, View, type TextInputInstance } from 'react-native';
 
 import { Fonts, Spacing } from '@/shared/config';
 import { useTheme } from '@/shared/lib';
@@ -31,7 +31,7 @@ export function OtpInput({
   autoFocus = true,
 }: OtpInputProps) {
   const theme = useTheme();
-  const inputRef = useRef<TextInput>(null);
+  const inputRef = useRef<TextInputInstance>(null);
   const [focused, setFocused] = useState(autoFocus);
 
   const handleChange = (text: string) => {

@@ -1,4 +1,4 @@
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { Tabs } from 'expo-router/js-tabs';
 import type { ColorValue } from 'react-native';
 import { SymbolView, type SymbolViewProps } from 'expo-symbols';
@@ -12,6 +12,10 @@ function tabIcon(name: SymbolViewProps['name']) {
 }
 
 export default function EventLayout() {
+  // Since Expo Router 58, switching tabs no longer copies the parent's [eventId] into the tab's
+  // route, so every tab link carries it explicitly (see the SDK 57 → 58 migration guide).
+  const { eventId } = useLocalSearchParams<{ eventId: string }>();
+
   return (
     <Tabs
       screenOptions={{
@@ -22,6 +26,7 @@ export default function EventLayout() {
         name="index"
         options={{
           title: 'Overview',
+          href: { pathname: '/scanner/events/[eventId]', params: { eventId } },
           tabBarIcon: tabIcon({ ios: 'chart.bar', android: 'bar_chart', web: 'bar_chart' }),
         }}
       />
@@ -29,6 +34,7 @@ export default function EventLayout() {
         name="scan"
         options={{
           title: 'Scan',
+          href: { pathname: '/scanner/events/[eventId]/scan', params: { eventId } },
           tabBarIcon: tabIcon({ ios: 'qrcode.viewfinder', android: 'qr_code_scanner', web: 'qr_code_scanner' }),
         }}
       />
@@ -37,6 +43,7 @@ export default function EventLayout() {
         options={{
           title: 'Attendees',
           headerShown: false,
+          href: { pathname: '/scanner/events/[eventId]/attendees', params: { eventId } },
           tabBarIcon: tabIcon({ ios: 'person.2', android: 'group', web: 'group' }),
         }}
       />
@@ -44,6 +51,7 @@ export default function EventLayout() {
         name="check-ins"
         options={{
           title: 'Check-ins',
+          href: { pathname: '/scanner/events/[eventId]/check-ins', params: { eventId } },
           tabBarIcon: tabIcon({ ios: 'checklist', android: 'checklist', web: 'checklist' }),
         }}
       />

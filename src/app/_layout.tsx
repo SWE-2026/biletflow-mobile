@@ -2,13 +2,16 @@ import '@/global.css';
 
 import { DarkTheme, DefaultTheme, Stack, ThemeProvider } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
-import { useColorScheme } from 'react-native';
+import { Appearance, useColorScheme } from 'react-native';
 
 import { SessionProvider, useSession } from '@/entities/session';
 import { Colors } from '@/shared/config';
 import { AnimatedSplashOverlay } from '@/shared/ui';
 
 SplashScreen.preventAutoHideAsync();
+// The app is light-only: ignore the phone's dark mode (app.json sets the same for native UI;
+// this also covers Expo Go, which doesn't apply that setting).
+Appearance.setColorScheme('light');
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();

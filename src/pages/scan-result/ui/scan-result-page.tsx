@@ -1,6 +1,7 @@
 import { router, useLocalSearchParams } from 'expo-router';
+import { useHeaderHeight } from 'expo-router/react-navigation';
 import { useState } from 'react';
-import { ScrollView, StyleSheet } from 'react-native';
+import { Platform, ScrollView, StyleSheet } from 'react-native';
 
 import { CheckInResultCard, parseCheckInResult, type CheckInResult } from '@/entities/check-in';
 import { canUndoCheckIn, fetchStaffEvent } from '@/entities/event';
@@ -16,6 +17,9 @@ export function ScanResultPage() {
   const { eventId } = params;
   const result = parseCheckInResult(params.result);
   const token = useAuthToken();
+  // On iOS the form sheet's header floats over the content; start the content below it.
+  const headerHeight = useHeaderHeight();
+  const topInset = Platform.OS === 'ios' ? headerHeight : 0;
   const [undone, setUndone] = useState(false);
   // For the undo permission and the event's time zone; the result itself is already here.
   const { data: details } = useAsyncData(eventId, (signal) => fetchStaffEvent(token, eventId, signal));
@@ -36,7 +40,7 @@ export function ScanResultPage() {
   const showUndo = result.result === 'valid' && !result.offline && ticket && details && canUndoCheckIn(details.role);
 
   return (
-    <ScrollView contentContainerStyle={styles.content}>
+    <ScrollView contentContainerStyle={[styles.content, { paddingTop: topInset + Spacing.four }]}>
       {undone ? (
         <Card>
           <ThemedText type="smallBold">Check-in undone</ThemedText>

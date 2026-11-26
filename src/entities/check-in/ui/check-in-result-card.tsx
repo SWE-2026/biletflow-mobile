@@ -59,7 +59,9 @@ const styles = StyleSheet.create({
   card: {
     alignItems: 'center',
     gap: Spacing.three,
-    padding: Spacing.four,
+    paddingHorizontal: Spacing.four,
+    // Extra room above and below the outcome (Tailwind py-5 = 20 on top of the base padding)
+    paddingVertical: Spacing.four + 20,
     borderRadius: Spacing.four,
     borderWidth: 3,
   },

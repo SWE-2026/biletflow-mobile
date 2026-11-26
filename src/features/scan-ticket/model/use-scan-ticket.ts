@@ -66,12 +66,16 @@ export function useScanTicket({ eventId, onResult }: UseScanTicketOptions) {
   const [error, setError] = useState<string | null>(null);
   const busy = useRef(false);
   const last = useRef<{ code: string; at: number } | null>(null);
+  // A code that failed for a reason other than the network: retrying it would fail the same way,
+  // so it is ignored until the error is dismissed or another code is scanned.
+  const failedCode = useRef<string | null>(null);
 
   const handleScan = async (raw: string) => {
     const code = raw.trim();
     const now = Date.now();
-    if (busy.current || !code) return;
+    if (busy.current || !code || code === failedCode.current) return;
     if (last.current?.code === code && now - last.current.at < REPEAT_COOLDOWN_MS) return;
+    failedCode.current = null;
     last.current = { code, at: now };
 
     if (code.length > MAX_CODE_LENGTH) {
@@ -85,8 +89,13 @@ export function useScanTicket({ eventId, onResult }: UseScanTicketOptions) {
     try {
       onResult(await checkIn(token, userId, eventId, code));
     } catch (e) {
-      // Allow an immediate retry of the same code after a network error.
-      last.current = null;
+      if (e instanceof ApiError && !isConnectivityError(e)) {
+        // The server answered with an error; the same code would get the same answer.
+        failedCode.current = code;
+      } else {
+        // No answer (network, timeout, gateway): allow an immediate retry of the same code.
+        last.current = null;
+      }
       setError(errorMessage(e));
     } finally {
       busy.current = false;
@@ -96,5 +105,10 @@ export function useScanTicket({ eventId, onResult }: UseScanTicketOptions) {
     }
   };
 
-  return { handleScan, pending, error, clearError: () => setError(null) };
+  const clearError = () => {
+    failedCode.current = null;
+    setError(null);
+  };
+
+  return { handleScan, pending, error, clearError };
 }
