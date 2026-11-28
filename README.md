@@ -1,56 +1,82 @@
-# Welcome to your Expo app 👋
+# BiletFlow Mobile
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Event Admin app for BiletFlow, a self-service event ticketing platform for Kazakhstan. Event Admins
+sign in, scan ticket QR codes, check attendees in (also offline) and see check-in stats. The app can
+also show the BiletFlow web app in a WebView, sharing the same session. Built with Expo and Expo Router.
 
-## Get started
+## Run it
 
-1. Install dependencies
+1. Start the API from [`../biletflow-api`](../biletflow-api) (API on http://localhost:8080, in local
+   mode):
+
+   ```bash
+   docker compose up --build
+   ```
+
+2. To use the web app option in the launcher, also start the web app from
+   [`../biletflow-frontend`](../biletflow-frontend) (on http://localhost:5173):
 
    ```bash
    npm install
+   npm run dev
    ```
 
-2. Start the app
+3. Install dependencies and start the app here:
 
    ```bash
+   npm install
    npx expo start
    ```
 
-In the output, you'll find options to open the app in a
+   In the Expo output, press `i` for the iOS simulator, `a` for the Android emulator or `w` for the
+   web, or scan the QR code with Expo Go on a phone. Scanning tickets needs a camera, so test it on a
+   phone.
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+The API runs in local mode, so sign-in codes are not emailed: the app shows them on the verify
+screen with a "Local mode" label.
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+## Pointing the app at the API
 
-## Get a fresh project
-
-When you're ready, run:
+Settings are read when the app is bundled. To change them, create `.env.local` (git-ignored) in this
+folder and restart `npx expo start`:
 
 ```bash
-npm run reset-project
+EXPO_PUBLIC_API_URL=http://10.0.2.2:8080/api/v1
+EXPO_PUBLIC_WEB_URL=http://10.0.2.2:5173
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+| Variable | Default | Meaning |
+|---|---|---|
+| `EXPO_PUBLIC_API_URL` | `http://localhost:8080/api/v1` | API base URL, including `/api/v1` |
+| `EXPO_PUBLIC_WEB_URL` | `http://localhost:5173` | where the web app runs, shown in the WebView |
 
-### Other setup steps
+`localhost` only works on the iOS simulator and the web. Elsewhere, use:
 
-- To set up ESLint for linting, run `npx expo lint`, or follow our guide on ["Using ESLint and Prettier"](https://docs.expo.dev/guides/using-eslint/)
-- If you'd like to set up unit testing, follow our guide on ["Unit Testing with Jest"](https://docs.expo.dev/develop/unit-testing/)
-- Learn more about the TypeScript setup in this template in our guide on ["Using TypeScript"](https://docs.expo.dev/guides/typescript/)
+| Where the app runs | Host to use |
+|---|---|
+| iOS simulator, web | `localhost` (the default) |
+| Android emulator | `10.0.2.2` |
+| Physical phone | your computer's LAN IP, e.g. `192.168.1.20`; the phone must be on the same network |
 
-## Learn more
+On a physical phone, start the web app with `npm run dev -- --host` so the phone can reach it. The
+web app must use the same API as this app, or the shared session will not work.
 
-To learn more about developing your project with Expo, look at the following resources:
+## Scripts
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+| Command | What it does |
+|---|---|
+| `npm start` | start the Expo dev server |
+| `npm run ios` / `npm run android` / `npm run web` | start and open on that platform |
+| `npm run lint` | ESLint (`expo lint`) |
+| `npx tsc --noEmit` | TypeScript check |
+| `npx expo run:ios` / `npx expo run:android` | build and run a development build, for when Expo Go can't open the app |
 
-## Join the community
+Do not run `npm run reset-project`. It is left over from the Expo template and moves the app's code
+out of the way.
 
-Join our community of developers creating universal apps.
+## Project layout
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+The code is in `src/` and follows [Feature-Sliced Design](https://feature-sliced.design):
+`app`, `pages`, `widgets`, `features`, `entities` and `shared`. `src/app/` is also the Expo Router
+root, so it holds only route and `_layout.tsx` files. The API contract is in
+[`../biletflow-api/docs/api.md`](../biletflow-api/docs/api.md).
